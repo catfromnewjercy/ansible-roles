@@ -1,0 +1,11 @@
+- name: Configure sshd_config
+  template:
+    src: ./templates/sshd_config.j2
+    dest: "/etc/ssh/sshd_config"
+    owner: root
+
+- name: Restart ssh service
+  ansible.builtin.service:
+    name: ssh
+    state: restarted
+  

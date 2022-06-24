@@ -1,0 +1,93 @@
+---
+- name: Update all packages to their latest pg_version
+  ansible.builtin.apt:
+    name: "*"
+    state: latest
+
+- name: Ensure a ru_RU locale exists
+  locale_gen:
+    name: ru_RU.UTF-8
+    state: present
+
+- name: Add postgresql apt repository key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+
+- name: Add postgresql apt repository
+  ansible.builtin.apt_repository:
+    repo: deb http://apt.postgresql.org/pub/repos/apt focal-pgdg main
+    state: present
+    filename: postgresql
+
+- name: Install postgresql dependencies
+  apt:
+    name: acl
+    state: present
+
+- name: Install postgresql
+  apt:
+    name: "postgresql-{{ pg_version }}"
+    state: present
+    update_cache: yes
+
+- name: Install python-psycopg2
+  apt:
+    name: python3-psycopg2
+    state: present
+
+- name: Ensure postgresql is enabled running
+  service:
+    name: postgresql
+    enabled: yes
+    state: started
+
+- name: Change listen_addresses to '*'
+  lineinfile:
+    dest: "/etc/postgresql/{{ pg_version }}/main/postgresql.conf"
+    regexp: "^#listen_addresses"
+    line: "listen_addresses = '*'"
+    state: present
+    backup: yes
+
+- name: Reset postgres user password
+  become: yes
+  become_method: sudo
+  become_user: postgres
+  postgresql_user:
+    db: postgres
+    user: postgres
+    password: '{{ postgres_password }}'
+
+- name: Configure pg_hba.conf
+  template:
+    src: ./templates/pg_hba.conf.j2
+    dest: "/etc/postgresql/{{ pg_version }}/main/pg_hba.conf"
+    owner: postgres
+  notify:
+    - restart postgresql
+
+- name: Restart postgresql service
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted
+
+- name: "Ensure the database {{ database_name }} is created"
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: "{{ database_name }}"
+    encoding: UTF-8
+    lc_collate: ru_RU.UTF-8
+    lc_ctype: ru_RU.UTF-8
+    template: template0
+
+- name: "Ensure the user {{ database_user }} has access to the database"
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    db: "{{ database_name }}"
+    name: "{{ database_user }}"
+    password: "{{ database_user_password }}"
+    encrypted: yes
+    priv: ALL
