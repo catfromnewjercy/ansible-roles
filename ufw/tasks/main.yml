@@ -1,18 +1,22 @@
 - name: allow ssh
   ufw:
     rule: allow
-    port: 44122
+    port: {{ssh_port}}
     proto: tcp
 
 - name: allow zabbix
   ufw:
     rule: allow
-    port: 10050:10051
+    port: {{zabbix_port}}
     proto: tcp
 
 - name: allow postgresql connection
   ufw:
     rule: allow
-    port: 5432
+    port: {{postgres_port}}
     proto: tcp
+
+- name: Enable ufw
+  ufw:
+    state: enabled
 

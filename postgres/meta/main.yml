@@ -1,0 +1,5 @@
+galaxy_info:
+  author: Konstantin Maltsev
+  description: Setup PostgreSQL
+  license: MIT
+  platforms: Debian, Ubuntu

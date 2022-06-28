@@ -1,0 +1,3 @@
+ssh_port: 44122
+postgres_port: 5432
+zabbix_port: 10050:10051

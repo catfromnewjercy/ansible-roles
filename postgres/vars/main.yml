@@ -1,5 +1,6 @@
-pg_version: 13
+pg_version:
 postgres_password:
 database_name:
 database_user:
 database_user_password:
+database_locale: 

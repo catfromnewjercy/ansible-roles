@@ -1,0 +1,5 @@
+galaxy_info:
+  author: Konstantin Maltsev
+  description: Set config for ssh
+  license: MIT
+  platforms: Debian, Ubuntu

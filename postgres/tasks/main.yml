@@ -6,7 +6,7 @@
 
 - name: Ensure a ru_RU locale exists
   locale_gen:
-    name: ru_RU.UTF-8
+    name: {{ database locale }}
     state: present
 
 - name: Add postgresql apt repository key
